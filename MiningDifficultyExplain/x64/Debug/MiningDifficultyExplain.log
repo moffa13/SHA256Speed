@@ -1,4 +1,4 @@
 ﻿  Source.cpp
-c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(11): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(58): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-  MiningDifficultyExplain.vcxproj -> C:\Users\moffa\source\repos\MiningDifficultyExplain\x64\Debug\MiningDifficultyExplain.exe
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(13): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(96): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+  MiningDifficultyExplain.vcxproj -> C:\Users\moffa\Desktop\Projects\SHA256Speed\x64\Debug\MiningDifficultyExplain.exe
