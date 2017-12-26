@@ -1,4 +1,6 @@
 ﻿  Source.cpp
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(13): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(96): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-  MiningDifficultyExplain.vcxproj -> C:\Users\moffa\Desktop\Projects\SHA256Speed\x64\Debug\MiningDifficultyExplain.exe
+c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(13): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(63): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1772): note: voir la déclaration de 'sprintf'
+c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(103): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+  MiningDifficultyExplain.vcxproj -> C:\Users\moffa\source\repos\MiningDifficultyExplain\x64\Debug\MiningDifficultyExplain.exe

@@ -32,21 +32,22 @@ int main() {
 
 	OpenSSL_add_all_algorithms();
 
-	constexpr unsigned difficulty = 4; // Number of zero before
+	constexpr unsigned difficulty = 3; // Number of zero before
 	uint64_t calculated_hashes = 0;
 	std::mutex calculated_hashes_mutex;
 
 	for (;;) {
-		std::string const rnd_str = rand_string(1048576); // 1MB Simulate a block
+		std::string const rnd_str = rand_string(10);
 
 		unsigned nonce = 0;
 		bool found = false;
+		unsigned char* found_hash = reinterpret_cast<unsigned char*>(malloc(32));
 		std::mutex nonce_mutex;
 		std::mutex found_mutex;
 		
-		std::thread* threads[7];
-		for (size_t i = 0; i < 7; ++i) {
-			threads[i] = new std::thread([&nonce_mutex, &nonce, &rnd_str, &calculated_hashes_mutex, &calculated_hashes, &found_mutex, &found, &difficulty]() {
+		std::thread* threads[4];
+		for (size_t i = 0; i < 4; ++i) {
+			threads[i] = new std::thread([&nonce_mutex, &nonce, &rnd_str, &calculated_hashes_mutex, &calculated_hashes, &found_mutex, &found, &difficulty, found_hash]() {
 				for (;;) {
 
 					found_mutex.lock();
@@ -55,12 +56,17 @@ int main() {
 					}
 					found_mutex.unlock();
 
-					//std::string nonce_str;
-					//nonce_mutex.lock();
-					//nonce_str = std::to_string(nonce);
-					//nonce++;
-					//nonce_mutex.unlock();
-					std::string data = /*nonce_str + */rnd_str;
+					int nonce_size = 0;
+					nonce_mutex.lock();
+					nonce_size = snprintf(NULL, 0, "%d", nonce);
+					char *nonce_str = reinterpret_cast<char*>(malloc(nonce_size + 1));
+					sprintf(nonce_str, "%d", nonce);
+					nonce++;
+					nonce_mutex.unlock();
+					std::string data = rnd_str;
+					data.reserve(nonce_size);
+					data.insert(0, nonce_str, nonce_size);
+					free(nonce_str);
 
 					unsigned char sha[32] = { 0 };
 					SHA256(reinterpret_cast<const unsigned char*>(data.c_str()), data.length(), sha);
@@ -68,15 +74,16 @@ int main() {
 					calculated_hashes++;
 					calculated_hashes_mutex.unlock();
 
-					/*int ref = 0;
+					int ref = 0;
 					memcpy(&ref, sha, difficulty);
 
 					if (ref == 0) {
 						std::cout << "hash found" << std::endl;
 						found_mutex.lock();
+						memcpy(found_hash, sha, 32);
 						found = true;
 						found_mutex.unlock();
-					}*/
+					}
 
 				}
 			});
@@ -98,12 +105,16 @@ int main() {
 				std::cout << std::fixed << (calculated_hashes / ratio) << " hash(es)/s" << std::endl;
 				calculated_hashes_mutex.unlock();
 				if (found) {
-					for (size_t i = 0; i < 7; ++i) {
+					for (size_t i = 0; i < 4; ++i) {
 						threads[i]->join();
 						delete threads[i];
 					}
+					print_hash(found_hash);
 				}
 			}
+
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(1s);
 		}
 		
 
