@@ -10,7 +10,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-#define MAX_THREADS 8
+#define MAX_THREADS 4
 
 std::string rand_string(size_t size) {
 	srand(time(0));
@@ -54,10 +54,11 @@ int main() {
 	std::thread* threads[MAX_THREADS];
 	for (size_t i = 0; i < MAX_THREADS; ++i) {
 		threads[i] = new std::thread([&nonce_mutex, &nonce, &in, &calculated_hashes_mutex, &calculated_hashes, &found_mutex, &found, &difficulty, found_hash, &found_nonce]() {
+			
+			uint64_t thread_nonce = 0;
+			int nonce_size = 0;
+			
 			for (;;) {
-
-				uint64_t thread_nonce = 0;
-				int nonce_size = 0;
 
 				// Lock nonce, local save it & increment it
 				nonce_mutex.lock();
