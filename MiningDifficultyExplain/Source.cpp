@@ -1,3 +1,4 @@
+#pragma comment(lib, "fmt.lib")
 #include <iostream>
 #include <ctime>
 #include <chrono>
@@ -6,11 +7,11 @@
 #include <thread>
 #include <mutex>
 #include <map>
+#define FMT_SHARED
+#include "include\fmt\format.h"
 #include <iomanip>
 #include <openssl/evp.h>
 #include <openssl/sha.h>
-
-#define MAX_THREADS 4
 
 std::string rand_string(size_t size) {
 	srand(time(0));
@@ -35,14 +36,29 @@ int main() {
 
 	OpenSSL_add_all_algorithms();
 
-	constexpr unsigned difficulty = 8; // Number of zero before
+	unsigned difficulty = 4; // Number of zero before
+	size_t threads_n = 2; // Concurrent threads
+	uint64_t nonce = 0; // Initial nonce is equal to zero
+
 	uint64_t calculated_hashes = 0; // Total number of hashes calculated in the program
 
 	std::string in;
 	std::cout << "Entrez un message : ";
 	std::cin >> in;
 
-	uint64_t nonce = 0; // Initial nonce is equal to zero
+#ifndef _DEBUG
+	std::cout << "Nombre de threads : ";
+	std::cin >> threads_n;
+
+	std::cout << "Nonce : ";
+	std::cin >> nonce;
+
+	std::cout << "Difficulte : ";
+	std::cin >> difficulty;
+	std::cout << std::endl;
+#endif
+
+	
 	bool found = false; // This is set by a thread if a correct a has been found
 	unsigned char* found_hash = reinterpret_cast<unsigned char*>(malloc(32)); // The final hash
 	uint64_t found_nonce = 0; // The final nonce
@@ -51,33 +67,30 @@ int main() {
 	std::mutex found_mutex;
 	std::mutex calculated_hashes_mutex;
 		
-	std::thread* threads[MAX_THREADS];
-	for (size_t i = 0; i < MAX_THREADS; ++i) {
+	std::thread** threads = reinterpret_cast<std::thread**>(malloc(threads_n * sizeof(std::thread*)));
+	for (size_t i = 0; i < threads_n; ++i) {
 		threads[i] = new std::thread([&nonce_mutex, &nonce, &in, &calculated_hashes_mutex, &calculated_hashes, &found_mutex, &found, &difficulty, found_hash, &found_nonce]() {
 			
 			uint64_t thread_nonce = 0;
 			int nonce_size = 0;
+			char *nonce_str = reinterpret_cast<char*>(malloc(32 + in.size()));
+			bool break_for = false;
 			
 			for (;;) {
 
 				// Lock nonce, local save it & increment it
 				nonce_mutex.lock();
-				nonce_size = snprintf(NULL, 0, "%d", nonce);
-				char *nonce_str = reinterpret_cast<char*>(malloc(nonce_size + 1));
-				sprintf(nonce_str, "%d", nonce);
+				if (found) break_for = true;
 				thread_nonce = nonce;
 				nonce++;
 				nonce_mutex.unlock();
+				if (break_for) break;
 
-				// Create the string to hash
-				std::string data = in;
-				data.reserve(nonce_size);
-				data.insert(0, nonce_str, nonce_size);
-				free(nonce_str);
-
+				int size = sprintf(nonce_str, "%d%s", thread_nonce, in.c_str());
+				
 				// Calculate the hash
 				unsigned char sha[32] = { 0 };
-				SHA256(reinterpret_cast<const unsigned char*>(data.c_str()), data.length(), sha);
+				SHA256(reinterpret_cast<const unsigned char*>(nonce_str), size, sha);
 
 				// Increment gloal hashes count
 				calculated_hashes_mutex.lock();
@@ -99,6 +112,8 @@ int main() {
 				}
 
 			}
+
+			free(nonce_str);
 		});
 	}
 
@@ -117,21 +132,32 @@ int main() {
 			std::cout << std::fixed << (calculated_hashes / ratio) << " hash(es)/s" << std::endl;
 			calculated_hashes_mutex.unlock();
 
+			nonce_mutex.lock();
+			std::cout << std::fixed << "Nonce : " << nonce << std::endl;
+			nonce_mutex.unlock();
+
+			bool break_for = false;
+
 			found_mutex.lock();
 			if (found) {
 				std::cout << std::to_string(found_nonce) << in << std::endl;
 				print_hash(found_hash);
-				for (size_t i = 0; i < MAX_THREADS; ++i) {
-					threads[i]->join();
-					delete threads[i];
+				for (size_t i = 0; i < threads_n; ++i) {
+					free(threads[i]);
 				}
+				free(threads);
+				break_for = true;
 			}
 			found_mutex.unlock();
+			if (break_for) break;
+
 		}
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(1s);
 	}
+
+	system("pause");
 
 	EVP_cleanup();
 
