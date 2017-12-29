@@ -1,10 +1,10 @@
 ﻿  Source.cpp
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(17): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(89): warning C4477: 'sprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 1 est de type 'uint64_t'
-  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(89): note: utilisez '%lld' dans la chaîne de format
-  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(89): note: utilisez '%Id' dans la chaîne de format
-  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(89): note: utilisez '%I64d' dans la chaîne de format
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(89): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(16): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(95): warning C4477: 'sprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 1 est de type 'uint64_t'
+  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(95): note: utilisez '%lld' dans la chaîne de format
+  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(95): note: utilisez '%Id' dans la chaîne de format
+  c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(95): note: utilisez '%I64d' dans la chaîne de format
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(95): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1772): note: voir la déclaration de 'sprintf'
-c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(130): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+c:\users\moffa\desktop\projects\sha256speed\miningdifficultyexplain\source.cpp(151): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
   MiningDifficultyExplain.vcxproj -> C:\Users\moffa\Desktop\Projects\SHA256Speed\x64\Debug\MiningDifficultyExplain.exe

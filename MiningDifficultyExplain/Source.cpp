@@ -1,4 +1,3 @@
-#pragma comment(lib, "fmt.lib")
 #include <iostream>
 #include <ctime>
 #include <chrono>
@@ -25,6 +24,13 @@ std::string rand_string(size_t size) {
 	return final_str;
 }
 
+uint64_t swap_uint64(uint64_t val)
+{
+	val = ((val << 8) & 0xFF00FF00FF00FF00ULL) | ((val >> 8) & 0x00FF00FF00FF00FFULL);
+	val = ((val << 16) & 0xFFFF0000FFFF0000ULL) | ((val >> 16) & 0x0000FFFF0000FFFFULL);
+	return (val << 32) | (val >> 32);
+}
+
 void print_hash(const unsigned char* sha256) {
 	for (size_t i = 0; i < 32; ++i) {
 		std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(sha256[i]);
@@ -36,8 +42,8 @@ int main() {
 
 	OpenSSL_add_all_algorithms();
 
-	unsigned difficulty = 4; // Number of zero before
-	size_t threads_n = 2; // Concurrent threads
+	unsigned difficulty = 8; // Number of zero before
+	size_t threads_n = 1; // Concurrent threads
 	uint64_t nonce = 0; // Initial nonce is equal to zero
 
 	uint64_t calculated_hashes = 0; // Total number of hashes calculated in the program
@@ -98,10 +104,23 @@ int main() {
 				calculated_hashes_mutex.unlock();
 
 				// Check leading zeroes
-				int ref = 0;
-				memcpy(&ref, sha, difficulty / 2);
+				bool matches = true;
 
-				if (ref == 0) {
+				for (size_t cur_byte = 0; cur_byte < difficulty / 2; ++cur_byte) {
+					if (sha[cur_byte] != 0) {
+						matches = false;
+						break;
+					}
+				}
+
+				if (matches && difficulty % 2 != 0) { // Needs one more check
+					size_t last_byte_check = static_cast<size_t>(difficulty / 2);
+					if (sha[last_byte_check] > 0x0F || sha[last_byte_check] == 0) {
+						matches = false;
+					}
+				}
+
+				if (matches) {
 					std::cout << "hash found" << std::endl;
 					found_mutex.lock();
 					found_nonce = thread_nonce;
@@ -129,7 +148,7 @@ int main() {
 			std::chrono::duration<double, std::milli> span = t2 - t1;
 			float ratio = span.count() / 1000;
 			calculated_hashes_mutex.lock();
-			std::cout << std::fixed << (calculated_hashes / ratio) << " hash(es)/s" << std::endl;
+			std::cout << std::fixed << static_cast<int>(calculated_hashes / ratio) << " hash(es)/s" << std::endl;
 			calculated_hashes_mutex.unlock();
 
 			nonce_mutex.lock();
