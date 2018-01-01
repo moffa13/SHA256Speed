@@ -12,6 +12,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
+// Prints a 32 bytes sha256 to the hexadecimal form filled with zeroes
 void print_hash(const unsigned char* sha256) {
 	for (size_t i = 0; i < 32; ++i) {
 		std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(sha256[i]);
@@ -19,6 +20,7 @@ void print_hash(const unsigned char* sha256) {
 	std::cout << std::dec << std::endl;
 }
 
+// Does the same as sprintf(char*, "%d%s", int, const char*)
 size_t concatenate_nonce(uint64_t nonce, const char* str, size_t strlen, char* out) {
 	uint64_t result = nonce;
 	uint8_t remainder;

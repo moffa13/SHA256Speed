@@ -1,8 +1,0 @@
-﻿  Source.cpp
-c:\users\moffa\source\repos\miningdifficultyexplain\miningdifficultyexplain\source.cpp(10): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-Source.obj : error LNK2019: symbole externe non résolu _OPENSSL_init_crypto référencé dans la fonction _main
-Source.obj : error LNK2019: symbole externe non résolu _SHA256 référencé dans la fonction _main
-C:\OpenSSL-Win64\lib\libcrypto.lib : warning LNK4272: type d'ordinateur bibliothèque 'x64' en conflit avec le type d'ordinateur cible 'x86'
-C:\OpenSSL-Win64\lib\openssl.lib : warning LNK4272: type d'ordinateur bibliothèque 'x64' en conflit avec le type d'ordinateur cible 'x86'
-C:\OpenSSL-Win64\lib\libssl.lib : warning LNK4272: type d'ordinateur bibliothèque 'x64' en conflit avec le type d'ordinateur cible 'x86'
-C:\Users\moffa\source\repos\MiningDifficultyExplain\Debug\MiningDifficultyExplain.exe : fatal error LNK1120: 2 externes non résolus
