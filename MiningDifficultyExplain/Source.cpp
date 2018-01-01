@@ -1,13 +1,13 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <cmath>
 #include <random>
 #include <string>
 #include <thread>
 #include <mutex>
 #include <map>
-#define FMT_SHARED
-#include "include\fmt\format.h"
+#include <stack>
 #include <iomanip>
 #include <openssl/evp.h>
 #include <openssl/sha.h>
@@ -24,8 +24,7 @@ std::string rand_string(size_t size) {
 	return final_str;
 }
 
-uint64_t swap_uint64(uint64_t val)
-{
+uint64_t swap_uint64(uint64_t val) {
 	val = ((val << 8) & 0xFF00FF00FF00FF00ULL) | ((val >> 8) & 0x00FF00FF00FF00FFULL);
 	val = ((val << 16) & 0xFFFF0000FFFF0000ULL) | ((val >> 16) & 0x0000FFFF0000FFFFULL);
 	return (val << 32) | (val >> 32);
@@ -36,6 +35,28 @@ void print_hash(const unsigned char* sha256) {
 		std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(sha256[i]);
 	}
 	std::cout << std::dec << std::endl;
+}
+
+size_t concatenate_nonce(uint64_t nonce, const char* str, size_t strlen, char* out) {
+	uint64_t result = nonce;
+	uint8_t remainder;
+	size_t nonce_size = nonce == 0 ? 1 : floor(log10(nonce)) + 1;
+	size_t i = nonce_size;
+	while (result >= 10) {
+		remainder = result % 10;
+		result /= 10;
+		out[--i] = remainder + '0';
+	}
+	
+	out[0] = result + '0';
+	i = nonce_size;
+
+	for (size_t c = 0; c < strlen; ++c) {
+		out[i++] = str[c];
+	}
+
+	out[i] = 0;
+	return i;
 }
 
 int main() {
@@ -92,8 +113,8 @@ int main() {
 				nonce_mutex.unlock();
 				if (break_for) break;
 
-				int size = sprintf(nonce_str, "%d%s", thread_nonce, in.c_str());
-				
+				size_t size = concatenate_nonce(thread_nonce, in.c_str(), in.size(), nonce_str);
+
 				// Calculate the hash
 				unsigned char sha[32] = { 0 };
 				SHA256(reinterpret_cast<const unsigned char*>(nonce_str), size, sha);
