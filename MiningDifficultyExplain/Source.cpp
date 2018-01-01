@@ -12,24 +12,6 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-std::string rand_string(size_t size) {
-	srand(time(0));
-	std::string const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	std::string final_str;
-	final_str.reserve(size);
-	for (unsigned i = 0; i < size; ++i) {
-		const int random = rand() % (possible.length());
-		final_str.push_back(possible.at(random));
-	}
-	return final_str;
-}
-
-uint64_t swap_uint64(uint64_t val) {
-	val = ((val << 8) & 0xFF00FF00FF00FF00ULL) | ((val >> 8) & 0x00FF00FF00FF00FFULL);
-	val = ((val << 16) & 0xFFFF0000FFFF0000ULL) | ((val >> 16) & 0x0000FFFF0000FFFFULL);
-	return (val << 32) | (val >> 32);
-}
-
 void print_hash(const unsigned char* sha256) {
 	for (size_t i = 0; i < 32; ++i) {
 		std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(sha256[i]);
