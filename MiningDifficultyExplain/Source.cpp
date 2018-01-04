@@ -45,35 +45,29 @@ size_t concatenate_nonce(uint64_t nonce, const char* str, size_t strlen, char* o
 
 bool checkZeroPadding(unsigned char* sha, size_t difficulty) {
 
-	bool matches = true;
-
 	for (size_t cur_byte = 0; cur_byte < difficulty / 2; ++cur_byte) {
 		if (sha[cur_byte] != 0) {
-			matches = false;
-			break;
+			return false;
 		}
 	}
 
-	if (matches) {
-		bool isOdd = difficulty % 2 != 0;
-		size_t last_byte_check = static_cast<size_t>(difficulty / 2);
-		if (isOdd) {
-			if (sha[last_byte_check] > 0x0F || sha[last_byte_check] == 0) {
-				matches = false;
-			}
-		} else {
-			if (sha[last_byte_check] < 0x0F) matches = false;
+	bool isOdd = difficulty % 2 != 0;
+	size_t last_byte_check = static_cast<size_t>(difficulty / 2);
+	if (isOdd) {
+		if (sha[last_byte_check] > 0x0F || sha[last_byte_check] == 0) {
+			return false;
 		}
 	}
-	
-	return matches;
+	else if (sha[last_byte_check] < 0x0F) return false;
+
+	return true;
 }
 
 int main() {
 
 	OpenSSL_add_all_algorithms();
 
-	unsigned difficulty = 2; // Number of zero before
+	unsigned difficulty = 1; // Number of zero before
 	size_t threads_n = 1; // Concurrent threads
 	uint64_t nonce = 0; // Initial nonce is equal to zero
 
