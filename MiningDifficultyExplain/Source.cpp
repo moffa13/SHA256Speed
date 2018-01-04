@@ -43,11 +43,37 @@ size_t concatenate_nonce(uint64_t nonce, const char* str, size_t strlen, char* o
 	return i;
 }
 
+bool checkZeroPadding(unsigned char* sha, size_t difficulty) {
+
+	bool matches = true;
+
+	for (size_t cur_byte = 0; cur_byte < difficulty / 2; ++cur_byte) {
+		if (sha[cur_byte] != 0) {
+			matches = false;
+			break;
+		}
+	}
+
+	if (matches) {
+		bool isOdd = difficulty % 2 != 0;
+		size_t last_byte_check = static_cast<size_t>(difficulty / 2);
+		if (isOdd) {
+			if (sha[last_byte_check] > 0x0F || sha[last_byte_check] == 0) {
+				matches = false;
+			}
+		} else {
+			if (sha[last_byte_check] < 0x0F) matches = false;
+		}
+	}
+	
+	return matches;
+}
+
 int main() {
 
 	OpenSSL_add_all_algorithms();
 
-	unsigned difficulty = 8; // Number of zero before
+	unsigned difficulty = 2; // Number of zero before
 	size_t threads_n = 1; // Concurrent threads
 	uint64_t nonce = 0; // Initial nonce is equal to zero
 
@@ -108,25 +134,8 @@ int main() {
 				calculated_hashes++;
 				calculated_hashes_mutex.unlock();
 
-				// Check leading zeroes
-				bool matches = true;
 
-				for (size_t cur_byte = 0; cur_byte < difficulty / 2; ++cur_byte) {
-					if (sha[cur_byte] != 0) {
-						matches = false;
-						break;
-					}
-				}
-
-				if (matches && difficulty % 2 != 0) { // Needs one more check
-					size_t last_byte_check = static_cast<size_t>(difficulty / 2);
-					if (sha[last_byte_check] > 0x0F || sha[last_byte_check] == 0) {
-						matches = false;
-					}
-				}
-
-				if (matches) {
-					std::cout << "hash found" << std::endl;
+				if (checkZeroPadding(sha, difficulty)) {
 					found_mutex.lock();
 					found_nonce = thread_nonce;
 					memcpy(found_hash, sha, 32);
@@ -164,6 +173,7 @@ int main() {
 
 			found_mutex.lock();
 			if (found) {
+				std::cout << "hash found" << std::endl;
 				std::cout << std::to_string(found_nonce) << in << std::endl;
 				print_hash(found_hash);
 				for (size_t i = 0; i < threads_n; ++i) {
